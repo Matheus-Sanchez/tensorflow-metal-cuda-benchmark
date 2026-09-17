@@ -21,6 +21,7 @@ Os dois testes usam FP32, XLA desativado por padrão, 5 repetições e salvam os
 | `main` | Script, instruções e relatório técnico da configuração do iMac. |
 | `results/mac` | Execuções produzidas no iMac M4 com TensorFlow Metal. |
 | `results/windows` | Execuções produzidas no Windows/WSL2 com TensorFlow CUDA/RTX A2000. |
+| `results/consolidated` | Integra as duas branches de resultados e mantém o relatório comparativo. |
 
 Cada branch de resultados deve receber a pasta completa criada pelo comando `run` (`metadata.json`, `samples.csv`, `summary.json` e `report.md`). Depois, use `compare` para gerar o comparativo com parâmetros idênticos.
 

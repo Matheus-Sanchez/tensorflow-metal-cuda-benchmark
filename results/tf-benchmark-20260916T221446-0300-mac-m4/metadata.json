@@ -1,0 +1,62 @@
+{
+  "benchmark": {
+    "name": "tensorflow-metal-cuda-benchmark",
+    "script_version": "1.0.0",
+    "started_at": "2026-09-17T01:14:46.683700+00:00",
+    "expect": "metal",
+    "xla_enabled": false,
+    "verify_placement": false,
+    "profile_enabled": false,
+    "selected_device": "/GPU:0",
+    "run_directory": "results/tf-benchmark-20260916T221446-0300-mac-m4",
+    "finished_at": "2026-09-17T01:15:32.116433+00:00",
+    "profile_directory": null
+  },
+  "platform": {
+    "system": "Darwin",
+    "release": "24.5.0",
+    "version": "Darwin Kernel Version 24.5.0: Tue Apr 22 19:54:43 PDT 2025; root:xnu-11417.121.6~2/RELEASE_ARM64_T8132",
+    "machine": "arm64",
+    "processor": "arm",
+    "python_version": "3.10.21 (main, Aug 14 2026, 15:25:49) [Clang 22.1.3 ]"
+  },
+  "tensorflow": {
+    "version": "2.18.1",
+    "keras_version": "3.12.4",
+    "tensorflow_metal_version": "1.2.0",
+    "build_info": {
+      "is_cuda_build": false,
+      "is_rocm_build": false,
+      "is_tensorrt_build": false
+    },
+    "physical_gpus": [
+      {
+        "index": 0,
+        "name": "/physical_device:GPU:0",
+        "device_type": "GPU",
+        "details": {
+          "device_name": "METAL"
+        }
+      }
+    ],
+    "logical_gpus": [
+      "/device:GPU:0"
+    ],
+    "visible_devices": [
+      {
+        "name": "/physical_device:CPU:0",
+        "device_type": "CPU"
+      },
+      {
+        "name": "/physical_device:GPU:0",
+        "device_type": "GPU"
+      }
+    ],
+    "xla_jit_setting": ""
+  },
+  "environment": {
+    "TF_XLA_FLAGS": "--tf_xla_auto_jit=0",
+    "CUDA_VISIBLE_DEVICES": null,
+    "nvidia_smi": null
+  }
+}

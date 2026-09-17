@@ -322,12 +322,18 @@ def make_synthetic_batch(tf: Any, device: str, batch_size: int, seed: int):
         images = tf.random.stateless_normal(
             [batch_size, 28, 28, 1], seed=[seed, batch_size], dtype=tf.float32
         )
-        labels = tf.random.stateless_uniform(
-            [batch_size],
-            seed=[seed + 1, batch_size],
-            minval=0,
-            maxval=10,
-            dtype=tf.int32,
+        # Metal currently rejects the integer stateless-uniform kernel on this
+        # TensorFlow/plugin combination. Generate equivalent uniform values in
+        # float32 and cast them to integer class labels instead.
+        labels = tf.cast(
+            tf.random.stateless_uniform(
+                [batch_size],
+                seed=[seed + 1, batch_size],
+                minval=0.0,
+                maxval=10.0,
+                dtype=tf.float32,
+            ),
+            tf.int32,
         )
         materialize(tf.reduce_sum(images) + tf.cast(tf.reduce_sum(labels), tf.float32))
     return images, labels

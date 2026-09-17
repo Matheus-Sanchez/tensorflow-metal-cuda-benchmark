@@ -4,60 +4,70 @@
 **Branch de consolidação:** `results/consolidated`
 **Fontes:** `results/mac` e `results/windows`
 
-## Estado das evidências
+## Escopo e validade da comparação
 
-| Plataforma | Branch de origem | Execução encontrada | Situação |
+Os dois resultados foram validados pelo comando `compare`: usam FP32, XLA desativado, matriz 4096×4096, 10 aquecimentos, 100 operações/passos por repetição, cinco repetições e a mesma CNN (`Conv2D(16)-MaxPool-Conv2D(32)-GAP-Dense(10)`) com Adam. As imagens sintéticas e os rótulos foram criados uma única vez na GPU, antes da medição.
+
+| Plataforma | Branch de origem | Execução | Situação |
 |---|---|---|---|
-| iMac M4 / TensorFlow Metal | `results/mac` | Não | Pendente |
-| RTX A2000 / TensorFlow CUDA no WSL2 | `results/windows` | Sim | Consolidada |
+| iMac 24” 2024, Apple M4 / Metal | `results/mac` | `results/tf-benchmark-20260916T221446-0300-mac-m4/` | Consolidada |
+| Windows no WSL2, RTX A2000 / CUDA | `results/windows` | `results/tf-benchmark-20260917T124917-0300-wsl-rtx-a2000/` | Consolidada |
 
-`results/mac` ainda contém somente a base do benchmark; não há `summary.json`, `samples.csv` ou `metadata.json` de uma execução Metal. Por isso, este relatório registra os dados Windows individualmente e deixa os campos comparativos como **não calculáveis**. Não é válido inferir ou estimar os valores do Mac a partir do hardware.
+O teste mede a execução GPU do TensorFlow, e não inclui download de dados, `tf.data`, cópias de host para dispositivo, validação, checkpoints ou callbacks. Portanto, ele não representa sozinho a duração de um experimento completo.
 
-## Resultado individual — Windows/WSL2
+## Ambientes registrados
 
-| Campo | Valor |
-|---|---|
-| GPU | NVIDIA RTX A2000 12 GB |
-| Driver NVIDIA | 596.51 |
-| Sistema | Linux 6.18.33.2-microsoft-standard-WSL2 |
-| TensorFlow | 2.21.0 |
-| Precisão | FP32 |
-| XLA | Desativado |
-| Repetições | 5 por cenário |
+| Item | Mac | Windows/WSL2 |
+|---|---|---|
+| Hardware | iMac 24” (2024), Apple M4, GPU integrada de 10 núcleos, 16 GB de memória unificada | NVIDIA RTX A2000 12 GB dedicada |
+| Sistema | macOS 15.5, Darwin 24.5.0, ARM64 | Linux 6.18.33.2-microsoft-standard-WSL2, x86_64 |
+| Backend GPU confirmado | `tensorflow-metal` 1.2.0, `/device:GPU:0` | CUDA 12.5.1 / cuDNN 9, `/device:GPU:0` |
+| TensorFlow | 2.18.1 | 2.21.0 |
+| XLA | Desativado | Desativado |
 
-### Matmul FP32
+Há uma diferença de versão do TensorFlow entre as execuções. Assim, este é um comparativo dos ambientes realmente usados (hardware + backend + runtime), não uma medição que isole apenas a arquitetura do hardware.
 
-| Parâmetros | Tempo mediano | Throughput mediano | Dispersão entre repetições |
+## Resultado individual — Mac M4 / TensorFlow Metal
+
+| Teste | Tempo mediano | Throughput mediano |
+|---|---:|---:|
+| Matmul FP32 4096×4096 | 47,4441 ms/op | 2.896,9 GFLOP/s |
+| CNN, batch 32 | 3,7815 ms/passo | 264,4 passos/s; 8.462,1 imagens/s |
+| CNN, batch 64 | 3,7060 ms/passo | 269,8 passos/s; 17.269,4 imagens/s |
+| CNN, batch 128 | 3,9019 ms/passo | 256,3 passos/s; 32.804,2 imagens/s |
+| CNN, batch 256 | 4,4148 ms/passo | 226,5 passos/s; 57.986,5 imagens/s |
+
+Arquivos de evidência: `metadata.json`, `summary.json` e `samples.csv` em `results/tf-benchmark-20260916T221446-0300-mac-m4/`.
+
+## Resultado individual — RTX A2000 / TensorFlow CUDA
+
+| Teste | Tempo mediano | Throughput mediano |
+|---|---:|---:|
+| Matmul FP32 4096×4096 | 10,1791 ms/op | 13.502,0 GFLOP/s |
+| CNN, batch 32 | 1,8653 ms/passo | 536,1 passos/s; 17.155,8 imagens/s |
+| CNN, batch 64 | 1,9213 ms/passo | 520,5 passos/s; 33.310,1 imagens/s |
+| CNN, batch 128 | 2,0259 ms/passo | 493,6 passos/s; 63.180,4 imagens/s |
+| CNN, batch 256 | 2,2422 ms/passo | 446,0 passos/s; 114.172,1 imagens/s |
+
+Arquivos de evidência: `metadata.json`, `summary.json` e `samples.csv` em `results/tf-benchmark-20260917T124917-0300-wsl-rtx-a2000/`.
+
+## Comparação automática
+
+| Teste | Mac M4 / Metal | RTX A2000 / CUDA | Razão Mac/Windows |
 |---|---:|---:|---:|
-| 4096×4096; 100 operações por repetição | 10,1791 ms/op | 13.502,0 GFLOP/s | 10,91 ms de desvio-padrão por bloco de 100 operações |
+| Matmul FP32 4096×4096 | 47,4441 ms/op | 10,1791 ms/op | 4,66× |
+| CNN, batch 32 | 3,7815 ms/passo | 1,8653 ms/passo | 2,03× |
+| CNN, batch 64 | 3,7060 ms/passo | 1,9213 ms/passo | 1,93× |
+| CNN, batch 128 | 3,9019 ms/passo | 2,0259 ms/passo | 1,93× |
+| CNN, batch 256 | 4,4148 ms/passo | 2,2422 ms/passo | 1,97× |
 
-### Treino de CNN com lote residente na GPU
+Razão maior que 1 significa que o Mac levou mais tempo naquele workload. O artefato gerado pelo comando de comparação está em `results/tf-comparison-20260917T130256-0300/`.
 
-Os dados sintéticos foram criados antes da janela de medição. Cada passo inclui somente forward, gradientes e atualização Adam.
+## Conclusão técnica
 
-| Batch | Tempo mediano | Passos/s | Imagens/s |
-|---:|---:|---:|---:|
-| 32 | 1,8653 ms | 536,1 | 17.155,8 |
-| 64 | 1,9213 ms | 520,5 | 33.310,1 |
-| 128 | 2,0259 ms | 493,6 | 63.180,4 |
-| 256 | 2,2422 ms | 446,0 | 114.172,1 |
+- No `matmul` grande, o ambiente CUDA foi 4,66× mais rápido. Isso se aproxima da diferença de 5–6× observada em alguns treinos, mas não a reproduz integralmente.
+- Na CNN pequena com lote já residente na GPU, o ambiente CUDA foi entre 1,93× e 2,03× mais rápido. Logo, para esse núcleo de treino isolado, a diferença não é de 5–6×.
+- Se o treino real permanece 5–6× mais lento no Mac, a parcela adicional provavelmente está fora deste microbenchmark: pipeline `tf.data`, augmentations, I/O, tamanho/forma do modelo, validação, checkpoints, callbacks, ou operações que caem na CPU. A revisão do código do treino é necessária para localizar essa parcela.
+- Os 16 GB unificados do M4 e os 12 GB de VRAM dedicada da RTX A2000 não são métricas equivalentes. Além da capacidade, diferem o tipo de memória, o compartilhamento com a CPU e a pilha Metal versus CUDA/cuDNN.
 
-Os arquivos-fonte deste resultado estão em `results/tf-benchmark-20260917T124917-0300-wsl-rtx-a2000/`.
-
-## Comparação Metal vs. CUDA
-
-| Teste | Mac M4 / Metal | Windows RTX A2000 / CUDA | Razão Mac/Windows |
-|---|---:|---:|---:|
-| Matmul FP32 4096×4096 | Pendente | 10,1791 ms/op | Não calculável |
-| CNN, batch 32 | Pendente | 1,8653 ms/passo | Não calculável |
-| CNN, batch 64 | Pendente | 1,9213 ms/passo | Não calculável |
-| CNN, batch 128 | Pendente | 2,0259 ms/passo | Não calculável |
-| CNN, batch 256 | Pendente | 2,2422 ms/passo | Não calculável |
-
-## Próximo passo para fechar o comparativo
-
-1. Execute o mesmo `tensorflow_benchmark.py run` no iMac com TensorFlow e `tensorflow-metal`, mantendo os parâmetros padrão e XLA desativado.
-2. Adicione o diretório gerado à branch `results/mac`.
-3. Na branch `results/consolidated`, execute `tensorflow_benchmark.py compare` apontando para os dois diretórios de resultado. O comando valida os parâmetros antes de calcular medianas e razões de desempenho.
-
-Somente após essa execução será apropriado concluir se a diferença observada no treino real persiste quando `tf.data`, I/O, callbacks e validação são removidos da medição.
+Para reprodução, use `outputs/tensorflow_benchmark.py compare` com os dois diretórios acima; o comando bloqueia comparações com parâmetros incompatíveis e salva CSV, JSON e Markdown.

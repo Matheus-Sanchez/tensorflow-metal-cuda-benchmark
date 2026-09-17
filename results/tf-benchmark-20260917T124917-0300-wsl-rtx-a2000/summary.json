@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "benchmark": {
+      "name": "tensorflow-metal-cuda-benchmark",
+      "script_version": "1.0.0",
+      "started_at": "2026-09-17T15:49:17.812327+00:00",
+      "expect": "cuda",
+      "xla_enabled": false,
+      "verify_placement": false,
+      "profile_enabled": false,
+      "selected_device": "/GPU:0",
+      "run_directory": "results/tf-benchmark-20260917T124917-0300-wsl-rtx-a2000",
+      "finished_at": "2026-09-17T15:49:37.817756+00:00",
+      "profile_directory": null
+    },
+    "platform": {
+      "system": "Linux",
+      "release": "6.18.33.2-microsoft-standard-WSL2",
+      "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026",
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "python_version": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]"
+    },
+    "tensorflow": {
+      "version": "2.21.0",
+      "keras_version": "3.12.4",
+      "tensorflow_metal_version": null,
+      "build_info": {
+        "cpu_compiler": "clang",
+        "cuda_compute_capabilities": [
+          "sm_60",
+          "sm_70",
+          "sm_80",
+          "sm_89",
+          "compute_90"
+        ],
+        "cuda_version": "12.5.1",
+        "cudnn_version": "9",
+        "is_cuda_build": true,
+        "is_rocm_build": false,
+        "is_tensorrt_build": false
+      },
+      "physical_gpus": [
+        {
+          "index": 0,
+          "name": "/physical_device:GPU:0",
+          "device_type": "GPU",
+          "details": {
+            "compute_capability": [
+              8,
+              6
+            ],
+            "device_name": "NVIDIA RTX A2000 12GB"
+          }
+        }
+      ],
+      "logical_gpus": [
+        "/device:GPU:0"
+      ],
+      "visible_devices": [
+        {
+          "name": "/physical_device:CPU:0",
+          "device_type": "CPU"
+        },
+        {
+          "name": "/physical_device:GPU:0",
+          "device_type": "GPU"
+        }
+      ],
+      "xla_jit_setting": ""
+    },
+    "environment": {
+      "TF_XLA_FLAGS": "--tf_xla_auto_jit=0",
+      "CUDA_VISIBLE_DEVICES": null,
+      "nvidia_smi": "NVIDIA RTX A2000 12GB, 596.51, 12282 MiB"
+    }
+  },
+  "benchmark_specification": {
+    "dtype": "float32",
+    "xla_enabled": false,
+    "matrix_size": 4096,
+    "matmul_warmup": 10,
+    "matmul_iterations": 100,
+    "train_warmup": 20,
+    "train_steps": 100,
+    "batches": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "repetitions": 5,
+    "model": "Conv2D(16)-MaxPool-Conv2D(32)-GAP-Dense(10)",
+    "optimizer": "Adam(learning_rate=0.001)",
+    "loss": "SparseCategoricalCrossentropy(from_logits=True)",
+    "dataset": "synthetic; fixed batch resident on selected device"
+  },
+  "result_summaries": [
+    {
+      "test": "matmul_fp32",
+      "matrix_size": 4096,
+      "iterations": 100,
+      "median_seconds_per_operation": 0.010179118319999816,
+      "median_gflops": 13502.04891537232,
+      "elapsed_seconds": {
+        "min": 1.0115461410000535,
+        "median": 1.0179118319999816,
+        "mean": 1.0223896386000206,
+        "max": 1.0391922349999732,
+        "stdev": 0.010908969413709661
+      },
+      "output_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ]
+    },
+    {
+      "test": "tiny_cnn_train_resident_batch",
+      "batch_size": 32,
+      "iterations": 100,
+      "median_seconds_per_step": 0.0018652589999999236,
+      "median_steps_per_second": 536.1185765623117,
+      "median_images_per_second": 17155.794449993973,
+      "elapsed_seconds": {
+        "min": 0.18449877700004436,
+        "median": 0.18652589999999236,
+        "mean": 0.18887878760001514,
+        "max": 0.19664264300001832,
+        "stdev": 0.004831504147352185
+      },
+      "input_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ],
+      "output_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ]
+    },
+    {
+      "test": "tiny_cnn_train_resident_batch",
+      "batch_size": 64,
+      "iterations": 100,
+      "median_seconds_per_step": 0.001921339220000391,
+      "median_steps_per_second": 520.4702998774972,
+      "median_images_per_second": 33310.09919215982,
+      "elapsed_seconds": {
+        "min": 0.17994191200000387,
+        "median": 0.1921339220000391,
+        "mean": 0.18858551559999343,
+        "max": 0.1973857749999297,
+        "stdev": 0.007901033480202437
+      },
+      "input_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ],
+      "output_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ]
+    },
+    {
+      "test": "tiny_cnn_train_resident_batch",
+      "batch_size": 128,
+      "iterations": 100,
+      "median_seconds_per_step": 0.002025946029999659,
+      "median_steps_per_second": 493.5965643666077,
+      "median_images_per_second": 63180.36023892579,
+      "elapsed_seconds": {
+        "min": 0.18642853999995168,
+        "median": 0.2025946029999659,
+        "mean": 0.20096479339997586,
+        "max": 0.2076619029999165,
+        "stdev": 0.008523151010465203
+      },
+      "input_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ],
+      "output_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ]
+    },
+    {
+      "test": "tiny_cnn_train_resident_batch",
+      "batch_size": 256,
+      "iterations": 100,
+      "median_seconds_per_step": 0.002242229490000227,
+      "median_steps_per_second": 445.98467929342,
+      "median_images_per_second": 114172.07789911552,
+      "elapsed_seconds": {
+        "min": 0.22321178200002123,
+        "median": 0.2242229490000227,
+        "mean": 0.22573342020002657,
+        "max": 0.2311064840000654,
+        "stdev": 0.003288997082260525
+      },
+      "input_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ],
+      "output_devices": [
+        "/job:localhost/replica:0/task:0/device:GPU:0"
+      ]
+    }
+  ]
+}
